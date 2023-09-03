@@ -16,6 +16,7 @@ import ru.starfarm.spleef.listeners.CancellerListener
 import ru.starfarm.spleef.listeners.LoaderListener
 import ru.starfarm.spleef.npcs.NpcService
 import ru.starfarm.spleef.player.SpleefPlayerService
+import java.util.logging.Logger
 
 /**
  * @author nolleNNN
@@ -25,6 +26,7 @@ import ru.starfarm.spleef.player.SpleefPlayerService
 val Plugin: Spleef by lazy { JavaPlugin.getPlugin(Spleef::class.java) }
 val Task by lazy(Plugin::taskContext)
 val Event by lazy(Plugin::eventContext)
+val Logger: Logger by lazy(Plugin::getLogger)
 val DatabaseConnection by lazy {
     DatabaseApi.createConnection(
         DatabaseCredentials(

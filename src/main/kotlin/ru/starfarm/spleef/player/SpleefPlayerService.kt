@@ -4,9 +4,7 @@ import com.google.gson.reflect.TypeToken
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
-import ru.starfarm.core.ApiManager
 import ru.starfarm.core.database.query.row.ValueQueryRow
-import ru.starfarm.core.profile.Profile
 import ru.starfarm.core.util.serializer.Serializer
 import ru.starfarm.spleef.Database
 import ru.starfarm.spleef.DatabaseConnection
@@ -31,9 +29,7 @@ object SpleefPlayerService : BukkitRunnable() {
         runTaskTimerAsynchronously(Plugin, 1L, 20L * TimeUnit.MINUTES.toSeconds(5))
     }
 
-    fun load(uuid: UUID) {
-        load(Bukkit.getPlayer(uuid))
-    }
+    fun load(uuid: UUID) = load(Bukkit.getPlayer(uuid))
 
     private fun load(player: Player) {
         table.newDatabaseQuery()
@@ -73,23 +69,25 @@ object SpleefPlayerService : BukkitRunnable() {
             }
     }
 
-    fun unload(player: Player) {
-        save(Players.remove(player.uniqueId)!!)
-    }
+    fun unload(player: Player) = save(Players.remove(player.uniqueId)!!)
 
     private fun save(spleefPlayerInfo: SpleefPlayerInfo) {
         Database.executeUpdate(
-            false, "UPDATE `${table.name}` SET `rating` = ?, `wins` = ?, `draw` = ?, `lose` = ?, `coins` = ?, `items` = ? WHERE `uuid` = ?",
-            spleefPlayerInfo.rating, spleefPlayerInfo.wins, spleefPlayerInfo.draw, spleefPlayerInfo.lose, spleefPlayerInfo.coins,
-            Serializer.toJson(spleefPlayerInfo.items), spleefPlayerInfo.uuid
+            false,
+            "UPDATE `${table.name}` SET `rating` = ?, `wins` = ?, `draw` = ?, `lose` = ?, `coins` = ?, `items` = ? WHERE `uuid` = ?",
+            spleefPlayerInfo.rating,
+            spleefPlayerInfo.wins,
+            spleefPlayerInfo.draw,
+            spleefPlayerInfo.lose,
+            spleefPlayerInfo.coins,
+            Serializer.toJson(spleefPlayerInfo.items),
+            spleefPlayerInfo.uuid
         )
     }
 
     fun getSpleefPlayer(player: Player): SpleefPlayerInfo? = Players[player.uniqueId]
     fun getSpleefPlayer(uuid: UUID): SpleefPlayerInfo? = Players[uuid]
 
+    override fun run() = Players.values.forEach { save(it) }
 
-    override fun run() {
-        Players.values.forEach { save(it) }
-    }
 }

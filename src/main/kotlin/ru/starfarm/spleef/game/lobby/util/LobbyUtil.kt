@@ -18,12 +18,9 @@ val buyItem = ApiManager.buildItem(Material.PAPER) {
     it.addLore("", "§aНажмите, чтобы приобрести различные игровые предметы!")
     it.addItemFlags(*ItemFlag.values())
 }
-fun Player.moveToLobby() {
-    this.teleport(LOBBY_LOCATION)
-}
-fun Player.addItem() {
-    player.inventory.addItem(buyItem)
-}
-fun Player.hasItemInMainHand(): Boolean {
-    return player.inventory.itemInMainHand == buyItem
-}
+
+fun Player.moveToLobby() = this.teleport(LOBBY_LOCATION)
+
+fun Player.addItem() = player.inventory.addItem(buyItem)!!
+
+fun Player.hasItemInMainHand(): Boolean = player.inventory.itemInMainHand == buyItem

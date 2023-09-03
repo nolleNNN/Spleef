@@ -6,7 +6,6 @@ import ru.starfarm.spleef.MapService
 import ru.starfarm.spleef.game.bars.GameBar
 import ru.starfarm.spleef.player.util.spleefPlayer
 import java.time.Duration
-import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -16,15 +15,19 @@ import java.util.concurrent.atomic.AtomicInteger
  * @Time 22:28
  */
 data class GameInfo(
-    val firstPlayer: Player,
-    val secondPlayer: Player,
+    private val firstPlayer: Player,
+    private val secondPlayer: Player,
     val mapId: String = listOf("first", "second")[ThreadLocalRandom.current().nextInt(2)],
-    val id: UUID = UUID.randomUUID(),
     val gameBar: GameBar = GameBar(),
     val duration: Duration = Duration.ofMinutes(3),
     var state: GameStateType = GameStateType.WAITING,
-    val map: LoadedWorld = MapService.loadWorld("SPLEEF", mapId, "$mapId-${AtomicInteger().getAndIncrement()}", true)
-        .get()
+    private val map: LoadedWorld = MapService.loadWorld(
+        "SPLEEF",
+        mapId,
+        "$mapId-${AtomicInteger().getAndIncrement()}",
+        true
+    )
+        .get(),
 ) {
 
     val zone get() = map.getCuboid(mapId)!!
@@ -35,14 +38,11 @@ data class GameInfo(
         val secondLocation = map.getPoint(mapId, "secondLocation")
         firstPlayer.teleport(firstLocation)
         secondPlayer.teleport(secondLocation)
-        players.forEach {
-            it.addItem()
-        }
+        players.forEach { it.addItem() }
         gameBar.addBar(players)
     }
 
     fun updateBar() = gameBar.updateBar(this)
-
 
     fun changeState(gameStateType: GameStateType) {
         state = gameStateType

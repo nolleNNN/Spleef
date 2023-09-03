@@ -14,13 +14,9 @@ import ru.starfarm.spleef.player.SpleefPlayerService
 class LoaderListener : Listener {
 
     @EventHandler
-    fun AsyncPlayerPreLoginEvent.handle() {
-        SpleefPlayerService.load(uniqueId)
-    }
+    fun AsyncPlayerPreLoginEvent.handle() = SpleefPlayerService.load(uniqueId)
 
     @EventHandler
-    fun PlayerQuitEvent.handle() {
-        SpleefPlayerService.unload(player)
-    }
+    fun PlayerQuitEvent.handle() = SpleefPlayerService.unload(player)
 
 }

@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack
 import ru.starfarm.core.ApiManager
 import ru.starfarm.core.util.format.ChatUtil
 import ru.starfarm.spleef.DatabaseConnection
+import ru.starfarm.spleef.Logger
 
 /**
  * @author nolleNNN
@@ -29,12 +30,12 @@ object ItemService {
                     val material = Material.getMaterial(it.getString("material"))
                     items[id] = ItemInfo(id, name, lore, price, material)
                 }
+                Logger.info("Loaded ${items.size} items")
             }
     }
 
-    fun getItem(id: Int): ItemInfo? {
-        return items[id]
-    }
+    fun getItem(id: Int): ItemInfo? = items[id]
+
 }
 
 data class ItemInfo(
@@ -42,23 +43,19 @@ data class ItemInfo(
     val name: String,
     val lore: String,
     val price: Int,
-    val material: Material
+    val material: Material,
 ) {
 
-    fun getItemStack(): ItemStack {
-        return ApiManager.buildItem(material) {
-            it.name = ChatUtil.color(name)
-            it.lore(lore)
-            it.addLore("", "§bЦена: §6$price §bкоинов.")
-            it.addItemFlags(*ItemFlag.values())
-        }
+    fun getItemStack(): ItemStack = ApiManager.buildItem(material) {
+        it.name = ChatUtil.color(name)
+        it.lore(lore)
+        it.addLore("", "§bЦена: §6$price §bкоинов.")
+        it.addItemFlags(*ItemFlag.values())
     }
 
-    fun getBuyItemStack(): ItemStack {
-        return ApiManager.buildItem(material) {
-            it.name = ChatUtil.color(name)
-            it.addItemFlags(*ItemFlag.values())
-        }
+    fun getBuyItemStack(): ItemStack = ApiManager.buildItem(material) {
+        it.name = ChatUtil.color(name)
+        it.addItemFlags(*ItemFlag.values())
     }
 
 }

@@ -51,8 +51,8 @@ class Game {
 
     private fun drawGame() {
         gameInfo.players.forEach {
-            it.addCoin(15)
-            it.addDraw()
+            it.coins += 15
+            it.draw++
             it.player.moveToLobby()
         }
         gameInfo.gameBar.removeBar(gameInfo.players)
@@ -61,14 +61,14 @@ class Game {
     private fun endGame() {
         gameInfo.players.forEach {
             if (it.player.gameMode == GameMode.SPECTATOR) {
-                it.addWin()
-                it.addRating(5)
-                it.addCoin(50)
+                it.wins++
+                it.rating += 5
+                it.coins += 50
                 it.player.sendPlayerMessage("§aВы победили и получили §650 §aмонет!")
             } else {
-                it.addLose()
-                it.removeRating(5)
-                it.addCoin(10)
+                it.lose++
+                it.rating -= 5
+                it.coins += 10
                 it.player.sendPlayerMessage("§cВы проиграли.. Вы получили §610 §смонет!")
             }
             it.player.moveToLobby()

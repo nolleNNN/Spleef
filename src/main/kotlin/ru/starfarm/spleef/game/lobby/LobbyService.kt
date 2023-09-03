@@ -24,16 +24,17 @@ import ru.starfarm.spleef.player.util.sendPlayerMessage
 object LobbyService {
     private val players = mutableListOf<Player>()
     private val clicks = mutableSetOf<Player>()
+
     init {
         Event.on<PlayerInteractFakeEntityEvent> {
-            if (entity.customName == NpcService.getNpc(1)!!.name && !clicks.contains(player)) {
+            if (entity == NpcService.get(1)!!.fakePlayer && !clicks.contains(player)) {
                 players.add(player)
                 clicks.add(player)
-                player.sendPlayerMessage("Вы успешно добавлены в очередь!")
+                player.sendPlayerMessage("§aВы успешно добавлены в очередь!")
             } else {
                 players.remove(player)
                 clicks.remove(player)
-                player.sendPlayerMessage("Вы покинули очередь!")
+                player.sendPlayerMessage("§cВы покинули очередь!")
             }
         }
         Event.on<PlayerJoinEvent> {

@@ -36,7 +36,7 @@ class ItemBuyMenu : InventoryContainer("Покупка предметов", 3) {
                     return@addItem
                 }
                 spleefPlayer.buyItem(id)
-                spleefPlayer.removeCoin(item.price)
+                spleefPlayer.coins -= item.price
                 player.sendPlayerMessage("§aВы успешно приобрели данный предмет!")
             }
         }

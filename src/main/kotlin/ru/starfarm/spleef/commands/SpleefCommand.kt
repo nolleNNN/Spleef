@@ -7,8 +7,8 @@ import ru.starfarm.core.command.patameter.tab.PlayersCompleter
 import ru.starfarm.core.command.require.Require
 import ru.starfarm.core.command.type.TypeInteger
 import ru.starfarm.core.command.type.TypePlayer
+import ru.starfarm.spleef.player.util.coloredName
 import ru.starfarm.spleef.player.util.spleefPlayer
-import ru.starfarm.spleef.player.util.profile
 
 /**
  * @author nolleNNN
@@ -40,10 +40,10 @@ class SpleefCommand : Command<Player>("spleef", "Для работы с режи
         }
         override fun execute(ctx: CommandContext<Player>) {
             val amount = ctx.getArg<Int>(0)
-            val player = if (ctx.hasArg(1)) ctx.getArg<Player>(1) else ctx.sender
-            player?.spleefPlayer!!.addCoin(amount!!)
+            val player = if (ctx.hasArg(1)) ctx.getArg<Player>(1)!! else ctx.sender
+            player.spleefPlayer!!.coins += amount!!
             ctx.sendMessage("§aВы успешно выдали §6$amount §aмонет " +
-                    if (player.name != ctx.sender.name) "игроку ${player.profile?.coloredName}" else "себе"
+                    if (player.name != ctx.sender.name) "игроку ${player.coloredName}" else "себе"
             )
         }
     }

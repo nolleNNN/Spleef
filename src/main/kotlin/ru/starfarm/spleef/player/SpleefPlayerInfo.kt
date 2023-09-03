@@ -17,26 +17,15 @@ data class SpleefPlayerInfo(
     var wins: Int = 0,
     var draw: Int = 0,
     var lose: Int = 0,
-    var coins: Int = 0
+    var coins: Int = 0,
 ) {
     private val buyItems get() = items.filter { it.value }.keys
+    val gameAmount get() = wins + lose + draw
 
-    fun addRating(rating: Int) { this.rating += rating }
-
-    fun removeRating(rating: Int) { this.rating -= rating }
-    fun addCoin(coins: Int) { this.coins += coins }
-
-    fun removeCoin(coins: Int) { this.coins -= coins }
-
-    fun addWin() { this.wins += 1 }
-
-    fun addDraw() { this.draw += 1 }
-
-    fun addLose() { this.lose += 1 }
-
-    fun buyItem(id: Int) { items[id] = true }
-
-    fun addItem() {
-        buyItems.forEach { player.inventory.addItem(ItemService.getItem(it)!!.getBuyItemStack()) }
+    fun buyItem(id: Int) {
+        items[id] = true
     }
+
+    fun addItem() = buyItems.forEach { player.inventory.addItem(ItemService.getItem(it)!!.getBuyItemStack()) }
+
 }

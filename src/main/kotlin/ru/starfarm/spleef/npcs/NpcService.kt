@@ -6,6 +6,7 @@ import ru.starfarm.core.util.bukkit.LocationUtil
 import ru.starfarm.core.util.format.ChatUtil
 import ru.starfarm.core.util.texture.skin.SkinUtil
 import ru.starfarm.spleef.DatabaseConnection
+import ru.starfarm.spleef.Logger
 
 /**
  * @author nolleNNN
@@ -26,31 +27,31 @@ object NpcService {
                     val name = it.getString("name")
                     val location = LocationUtil.fromString(it.getString("location"))
                     val skin = it.getString("skin")
-                    val npcInfo = NpcInfo(name, location, skin)
+                    val fakePlayer = FakePlayer(SkinUtil.getSkin(skin)!!, location)
+                    val npcInfo = NpcInfo(name, location, skin, fakePlayer)
                     npcs[id] = npcInfo
-                    npcInfo.createNpc()
                 }
+                Logger.info("Loaded ${npcs.size} NPCs")
             }
     }
 
-    fun getNpc(id: Int): NpcInfo? {
-        return npcs[id]
-    }
-
+    fun get(id: Int): NpcInfo? = npcs[id]
 }
 
 
 data class NpcInfo(
-    val name: String,
-    val location: Location,
-    val skin: String
+    private val name: String,
+    private val location: Location,
+    private val skin: String,
+    private val fake: FakePlayer,
 ) {
-    fun createNpc() {
-        FakePlayer(SkinUtil.getSkin(skin)!!, location).apply {
+    val fakePlayer get() = fake
+
+    init {
+        fake.apply {
             customName = ChatUtil.color(name)
             customNameVisible = true
         }
     }
-
 
 }
