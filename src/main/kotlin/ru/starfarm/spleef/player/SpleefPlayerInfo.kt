@@ -21,11 +21,11 @@ data class SpleefPlayerInfo(
 ) {
     private val buyItems get() = items.filter { it.value }.keys
     val gameAmount get() = wins + lose + draw
+    val percentWin get() = wins / lose
 
     fun buyItem(id: Int) {
         items[id] = true
     }
 
     fun addItem() = buyItems.forEach { player.inventory.addItem(ItemService.getItem(it)!!.getBuyItemStack()) }
-
 }

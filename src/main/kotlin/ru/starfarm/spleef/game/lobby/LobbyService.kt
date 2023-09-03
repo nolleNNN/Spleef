@@ -2,6 +2,7 @@ package ru.starfarm.spleef.game.lobby
 
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
+import org.bukkit.event.player.PlayerChangedWorldEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import ru.starfarm.core.entity.PlayerInteractFakeEntityEvent
@@ -14,6 +15,7 @@ import ru.starfarm.spleef.game.lobby.util.hasItemInMainHand
 import ru.starfarm.spleef.menu.ItemBuyMenu
 import ru.starfarm.spleef.npcs.NpcService
 import ru.starfarm.spleef.player.util.randomPlayer
+import ru.starfarm.spleef.player.util.removePlayer
 import ru.starfarm.spleef.player.util.sendPlayerMessage
 
 /**
@@ -37,9 +39,8 @@ object LobbyService {
                 player.sendPlayerMessage("§cВы покинули очередь!")
             }
         }
-        Event.on<PlayerJoinEvent> {
-            player.addItem()
-        }
+        Event.on<PlayerJoinEvent> { player.addItem() }
+        Event.on<PlayerChangedWorldEvent> { if (from.name == "world") player.addItem() }
         Event.on<PlayerInteractEvent> {
             if (player.hasItemInMainHand() && (action == Action.RIGHT_CLICK_BLOCK || action == Action.RIGHT_CLICK_AIR))
                 ItemBuyMenu().openInventory(player)
@@ -48,8 +49,7 @@ object LobbyService {
             if (players.size >= 2) {
                 val first = players.randomPlayer()
                 val second = players.randomPlayer()
-                clicks.remove(first)
-                clicks.remove(second)
+                clicks.removePlayer(first, second)
                 Game().startGame(first, second)
             }
         }

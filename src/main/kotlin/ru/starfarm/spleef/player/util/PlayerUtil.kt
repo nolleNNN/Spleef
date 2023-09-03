@@ -16,3 +16,4 @@ val Player.coloredName get() = profile!!.coloredName
 val Player.spleefPlayer get() = SpleefPlayerService.getSpleefPlayer(this)
 fun Player.sendPlayerMessage(message: String) = sendMessage("$PREFIX$message")
 fun MutableList<Player>.randomPlayer(): Player = removeAt(ThreadLocalRandom.current().nextInt(size - 1))
+fun MutableSet<Player>.removePlayer(vararg players: Player) = players.forEach { remove(it) }

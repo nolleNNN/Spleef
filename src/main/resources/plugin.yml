@@ -1,3 +1,6 @@
 name: Spleef
 version: '${version}'
 main: ru.starfarm.spleef.Spleef
+author: nolleNNN
+depend:
+  - Core

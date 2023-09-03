@@ -32,7 +32,7 @@ class SpleefCommand : Command<Player>("spleef", "Для работы с режи
         generateHelp(ctx.sender)
     }
 
-    class GiveMoneyCommand : Command<Player>("give", "Выдать монеты") {
+    inner class GiveMoneyCommand : Command<Player>("give", "Выдать монеты") {
         init {
 
             addParameter("Количество монет", TypeInteger())

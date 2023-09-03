@@ -23,4 +23,6 @@ fun Player.moveToLobby() = this.teleport(LOBBY_LOCATION)
 
 fun Player.addItem() = player.inventory.addItem(buyItem)!!
 
+fun Player.removeItem() = player.inventory.remove(buyItem)
+
 fun Player.hasItemInMainHand(): Boolean = player.inventory.itemInMainHand == buyItem

@@ -6,7 +6,9 @@ import org.bukkit.event.player.PlayerMoveEvent
 import ru.starfarm.core.event.on
 import ru.starfarm.spleef.Event
 import ru.starfarm.spleef.Task
+import ru.starfarm.spleef.game.lobby.util.addItem
 import ru.starfarm.spleef.game.lobby.util.moveToLobby
+import ru.starfarm.spleef.game.lobby.util.removeItem
 import ru.starfarm.spleef.player.util.sendPlayerMessage
 import java.time.Instant
 
@@ -19,6 +21,7 @@ class Game {
     private lateinit var gameInfo: GameInfo
     fun startGame(firstPlayer: Player, secondPlayer: Player) {
         gameInfo = GameInfo(firstPlayer, secondPlayer)
+        gameInfo.players.forEach { it.player.removeItem() }
         gameInfo.teleportToArenaSpawn()
         Event.on<PlayerMoveEvent> { if (gameInfo.state == GameStateType.WAITING) isCancelled = true }
         Task.asyncAfter(20 * 3) {
@@ -54,13 +57,14 @@ class Game {
             it.coins += 15
             it.draw++
             it.player.moveToLobby()
+            it.player.addItem()
         }
         gameInfo.gameBar.removeBar(gameInfo.players)
     }
 
     private fun endGame() {
         gameInfo.players.forEach {
-            if (it.player.gameMode == GameMode.SPECTATOR) {
+            if (it.player.gameMode != GameMode.SPECTATOR) {
                 it.wins++
                 it.rating += 5
                 it.coins += 50
@@ -72,6 +76,7 @@ class Game {
                 it.player.sendPlayerMessage("§cВы проиграли.. Вы получили §610 §смонет!")
             }
             it.player.moveToLobby()
+            it.player.addItem()
         }
         gameInfo.gameBar.removeBar(gameInfo.players)
     }

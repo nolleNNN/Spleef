@@ -26,6 +26,6 @@ class SpleefStatsCommand : Command<Player>() {
         ctx.sendMessage("Количестов побед - ${player.wins}")
         ctx.sendMessage("Количестов поражений - ${player.lose}")
         ctx.sendMessage("Количество игр сыгранных в ничью - ${player.draw}")
-        ctx.sendMessage("Процент побед - ${player.wins / player.lose}%")
+        ctx.sendMessage("Процент побед - ${player.percentWin}%")
     }
 }
