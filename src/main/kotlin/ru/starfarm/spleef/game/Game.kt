@@ -8,7 +8,6 @@ import ru.starfarm.spleef.Event
 import ru.starfarm.spleef.Task
 import ru.starfarm.spleef.game.lobby.util.addItem
 import ru.starfarm.spleef.game.lobby.util.moveToLobby
-import ru.starfarm.spleef.game.lobby.util.removeItem
 import ru.starfarm.spleef.player.util.sendPlayerMessage
 import java.time.Instant
 
@@ -21,9 +20,8 @@ class Game {
     private lateinit var gameInfo: GameInfo
     fun startGame(firstPlayer: Player, secondPlayer: Player) {
         gameInfo = GameInfo(firstPlayer, secondPlayer)
-        gameInfo.players.forEach { it.player.removeItem() }
         gameInfo.teleportToArenaSpawn()
-        Event.on<PlayerMoveEvent> { if (gameInfo.state == GameStateType.WAITING) isCancelled = true }
+        Event.on<PlayerMoveEvent> { if (gameInfo.gameState == GameStateType.WAITING) isCancelled = true }
         Task.asyncAfter(20 * 3) {
             gameInfo.changeState(GameStateType.RUNNING)
             runningGame()
@@ -31,9 +29,8 @@ class Game {
     }
 
     private fun runningGame() {
-        val time = Instant.now().plus(gameInfo.duration)
         Task.everyAsync(20, 20) {
-            if (Instant.now().isAfter(time)) {
+            if (Instant.now().isAfter(gameInfo.time)) {
                 drawGame()
                 gameInfo.changeState(GameStateType.ENDING)
                 gameInfo.updateBar()
@@ -43,7 +40,7 @@ class Game {
             gameInfo.updateBar()
         }
         Event.on<PlayerMoveEvent> {
-            if (gameInfo.zone.contains(player) && gameInfo.state != GameStateType.ENDING) {
+            if (gameInfo.zone.contains(player) && gameInfo.gameState != GameStateType.ENDING) {
                 gameInfo.changeState(GameStateType.ENDING)
                 player.gameMode = GameMode.SPECTATOR
                 endGame()
@@ -56,10 +53,8 @@ class Game {
         gameInfo.players.forEach {
             it.coins += 15
             it.draw++
-            it.player.moveToLobby()
-            it.player.addItem()
         }
-        gameInfo.gameBar.removeBar(gameInfo.players)
+        close()
     }
 
     private fun endGame() {
@@ -75,9 +70,16 @@ class Game {
                 it.coins += 10
                 it.player.sendPlayerMessage("§cВы проиграли.. Вы получили §610 §смонет!")
             }
-            it.player.moveToLobby()
-            it.player.addItem()
         }
-        gameInfo.gameBar.removeBar(gameInfo.players)
+        close()
+    }
+
+    private fun close() {
+        gameInfo.players.forEach {
+            it.player.addItem()
+            it.player.moveToLobby()
+        }
+        gameInfo.unloadWorld()
+        gameInfo.removeBar()
     }
 }

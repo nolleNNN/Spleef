@@ -24,9 +24,9 @@ class GameBar {
 
     fun updateBar(gameInfo: GameInfo) {
         val time =
-            Formatter.formatTimeText(Duration.between(Instant.now(), Instant.now().plus(gameInfo.duration)).toMillis())
+            Formatter.formatTimeText(Duration.between(Instant.now(), gameInfo.time).toMillis())
 
-        if (gameInfo.state == GameStateType.ENDING)
+        if (gameInfo.gameState == GameStateType.ENDING)
             setTitle("§aИгра окончена", true)
         else
             setTitle("§fДо конца игры: §6$time", false)
