@@ -3,9 +3,12 @@ package ru.starfarm.spleef
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
+import org.spigotmc.AsyncCatcher
 import ru.starfarm.core.CorePlugin
 import ru.starfarm.core.database.DatabaseApi
 import ru.starfarm.core.database.DatabaseCredentials
+import ru.starfarm.core.scoreboard.IScoreboardService
+import ru.starfarm.core.scoreboard.ScoreboardService
 import ru.starfarm.map.service.IMapService
 import ru.starfarm.spleef.commands.SpleefCommand
 import ru.starfarm.spleef.commands.SpleefDuelCommand
@@ -42,18 +45,20 @@ val MapService by lazy(IMapService::setup)
 class Spleef : CorePlugin() {
 
     override fun enable() {
+        AsyncCatcher.enabled = false
         ItemService
         NpcService
         SpleefPlayerService
         LobbyService
 
         registerListeners(
-            LoaderListener(), CancellerListener()
+            LoaderListener, CancellerListener
         )
 
         registerCommands(
-            SpleefCommand(), SpleefStatsCommand(), SpleefDuelCommand()
+            SpleefCommand, SpleefStatsCommand, SpleefDuelCommand
         )
+        registerService(IScoreboardService::class.java, ScoreboardService())
     }
 
     override fun disable() {

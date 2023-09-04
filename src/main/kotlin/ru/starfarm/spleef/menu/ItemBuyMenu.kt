@@ -21,22 +21,23 @@ class ItemBuyMenu : InventoryContainer("Покупка предметов", 3) {
             val item = ItemService.getItem(id)!!
 
             val buyItem = if (has) ApiManager.buildItem(item.material) {
-                it.name = item.name
-                it.addLore("", "§aВы успешно приобрели данный предмет!")
+                it.name = "§b${item.name}"
+                it.addLore("", "§aВы успешно приобрели", "§aданный предмет!")
                 it.addItemFlags(*ItemFlag.values())
             } else item.getItemStack()
 
-            addItem(id, buyItem) { _, _ ->
+            addItem(id - 1, buyItem) { _, _ ->
                 if (has) {
                     player.sendPlayerMessage("§cУ вас уже есть этот предмет!")
                     return@addItem
                 }
-                if (spleefPlayer.coins < item.price) {
+                if (spleefPlayer.coins < item.price || spleefPlayer.coins - item.price < 0) {
                     player.sendPlayerMessage("§cУ вас недостаточно средств для покупки этого предмета!")
                     return@addItem
                 }
                 spleefPlayer.buyItem(id)
                 spleefPlayer.coins -= item.price
+                updateInventory(player)
                 player.sendPlayerMessage("§aВы успешно приобрели данный предмет!")
             }
         }

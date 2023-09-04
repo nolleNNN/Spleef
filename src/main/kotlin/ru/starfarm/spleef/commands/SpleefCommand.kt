@@ -7,6 +7,7 @@ import ru.starfarm.core.command.patameter.tab.PlayersCompleter
 import ru.starfarm.core.command.require.Require
 import ru.starfarm.core.command.type.TypeInteger
 import ru.starfarm.core.command.type.TypePlayer
+import ru.starfarm.spleef.player.util.PREFIX
 import ru.starfarm.spleef.player.util.coloredName
 import ru.starfarm.spleef.player.util.spleefPlayer
 
@@ -15,12 +16,12 @@ import ru.starfarm.spleef.player.util.spleefPlayer
  * @Date 02.09.2023
  * @Time 20:33
  */
-class SpleefCommand : Command<Player>("spleef", "Для работы с режимом", "s", "sp") {
+object SpleefCommand : Command<Player>("spleef", "Для работы с режимом", "s", "sp") {
 
     init {
-        prefix = "§bSpleef"
+        prefix = PREFIX
 
-        addCommand(GiveMoneyCommand())
+        addCommand(GiveMoneyCommand)
 
         commands.forEach {
             it.prefix = prefix
@@ -32,7 +33,7 @@ class SpleefCommand : Command<Player>("spleef", "Для работы с режи
         generateHelp(ctx.sender)
     }
 
-    inner class GiveMoneyCommand : Command<Player>("give", "Выдать монеты") {
+    object GiveMoneyCommand : Command<Player>("give", "Выдать монеты") {
         init {
 
             addParameter("Количество монет", TypeInteger())

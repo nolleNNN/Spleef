@@ -10,6 +10,7 @@ import ru.starfarm.core.util.format.ChatUtil
 import ru.starfarm.core.util.format.message.hover.HoverEventType
 import ru.starfarm.spleef.Task
 import ru.starfarm.spleef.game.Game
+import ru.starfarm.spleef.game.lobby.LobbyService
 import ru.starfarm.spleef.player.SpleefPlayerInfo
 import ru.starfarm.spleef.player.util.PREFIX
 import ru.starfarm.spleef.player.util.coloredName
@@ -21,12 +22,12 @@ import ru.starfarm.spleef.player.util.spleefPlayer
  * @Date 03.09.2023
  * @Time 15:30
  */
-class SpleefDuelCommand : Command<Player>("duel", "Отправить дуэль игроку") {
+object SpleefDuelCommand : Command<Player>("duel", "Отправить дуэль игроку") {
     private val players = mutableMapOf<SpleefPlayerInfo, SpleefPlayerInfo>()
     init {
         prefix = PREFIX
 
-        addCommand(SpleefDenyDuelCommand())
+        addCommand(SpleefDenyDuelCommand)
 
         commands.forEach {
             it.prefix = prefix
@@ -65,7 +66,7 @@ class SpleefDuelCommand : Command<Player>("duel", "Отправить дуэль
                 return@everyAsync
             }
             if (it.periods >= 10) {
-                Game().startGame(sender.player, target.player)
+                Game().startGame(sender.player, target.player, LobbyService.maps[0])
                 it.cancel()
                 return@everyAsync
             }
@@ -73,13 +74,18 @@ class SpleefDuelCommand : Command<Player>("duel", "Отправить дуэль
         }
     }
 
-    inner class SpleefDenyDuelCommand : Command<Player>("deny", "Принять дуэль от игрока", "d") {
+    object SpleefDenyDuelCommand : Command<Player>("deny", "Принять дуэль от игрока", "d") {
         init {
             addParameter("Игрок", TypePlayer(), true, PlayersCompleter())
         }
 
         override fun execute(ctx: CommandContext<Player>) {
             val target = ctx.getArg<Player>(0)!!.spleefPlayer!!
+
+            if (target.player == ctx.sender) {
+                ctx.sendMessage("§cНельзя дать отказ самому себе!")
+                return
+            }
 
             players.remove(target)
             ctx.sendMessage("§cВы отказались от дуэли!")

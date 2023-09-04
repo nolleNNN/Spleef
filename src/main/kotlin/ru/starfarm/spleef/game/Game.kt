@@ -2,14 +2,17 @@ package ru.starfarm.spleef.game
 
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
+import org.bukkit.event.EventPriority
 import org.bukkit.event.player.PlayerMoveEvent
 import ru.starfarm.core.event.on
 import ru.starfarm.spleef.Event
+import ru.starfarm.spleef.MapService
 import ru.starfarm.spleef.Task
-import ru.starfarm.spleef.game.lobby.util.addItem
 import ru.starfarm.spleef.game.lobby.util.moveToLobby
 import ru.starfarm.spleef.player.util.sendPlayerMessage
+import ru.starfarm.spleef.player.util.sendPlayerTitle
 import java.time.Instant
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * @author nolleNNN
@@ -18,19 +21,38 @@ import java.time.Instant
  */
 class Game {
     private lateinit var gameInfo: GameInfo
-    fun startGame(firstPlayer: Player, secondPlayer: Player) {
-        gameInfo = GameInfo(firstPlayer, secondPlayer)
+    private val counter = AtomicInteger()
+    private val task = Task.fork(true)
+    private val event = Event.fork(true)
+    private var timer = 3
+    fun startGame(firstPlayer: Player, secondPlayer: Player, mapId: String) {
+        val loadedWorld = MapService.loadWorld("SPLEEF", mapId, "$mapId-${counter.getAndIncrement()}", true)
+        gameInfo = GameInfo(firstPlayer, secondPlayer, mapId, loadedWorld.get())
         gameInfo.teleportToArenaSpawn()
-        Event.on<PlayerMoveEvent> { if (gameInfo.gameState == GameStateType.WAITING) isCancelled = true }
-        Task.asyncAfter(20 * 3) {
-            gameInfo.changeState(GameStateType.RUNNING)
-            runningGame()
+        event.on<PlayerMoveEvent>(priority = EventPriority.HIGHEST) {
+            if (gameInfo.gameState == GameStateType.WAITING) isCancelled = true
         }
+        task.every(20, 20) { task ->
+            if (timer == 0) {
+                gameInfo.changeState(GameStateType.RUNNING)
+                gameInfo.addBar()
+                runningGame()
+                task.cancel()
+                return@every
+            }
+            gameInfo.players.forEach {
+                it.player.sendPlayerTitle(
+                    "§сДо начала игры", "$timer"
+                )
+            }
+            timer--
+        }
+
     }
 
     private fun runningGame() {
-        Task.everyAsync(20, 20) {
-            if (Instant.now().isAfter(gameInfo.time)) {
+        task.everyAsync(1, 1) {
+            if (Instant.now().isAfter(gameInfo.endStamp)) {
                 drawGame()
                 gameInfo.changeState(GameStateType.ENDING)
                 gameInfo.updateBar()
@@ -39,7 +61,7 @@ class Game {
             }
             gameInfo.updateBar()
         }
-        Event.on<PlayerMoveEvent> {
+        event.on<PlayerMoveEvent> {
             if (gameInfo.zone.contains(player) && gameInfo.gameState != GameStateType.ENDING) {
                 gameInfo.changeState(GameStateType.ENDING)
                 player.gameMode = GameMode.SPECTATOR
@@ -54,7 +76,7 @@ class Game {
             it.coins += 15
             it.draw++
         }
-        close()
+        task.asyncAfter(20 * 3) { close() }
     }
 
     private fun endGame() {
@@ -71,15 +93,14 @@ class Game {
                 it.player.sendPlayerMessage("§cВы проиграли.. Вы получили §610 §смонет!")
             }
         }
-        close()
+        task.asyncAfter(20 * 3) { close() }
     }
 
     private fun close() {
-        gameInfo.players.forEach {
-            it.player.addItem()
-            it.player.moveToLobby()
-        }
+        gameInfo.players.forEach { it.player.moveToLobby() }
         gameInfo.unloadWorld()
         gameInfo.removeBar()
+        task.close()
+        event.close()
     }
 }

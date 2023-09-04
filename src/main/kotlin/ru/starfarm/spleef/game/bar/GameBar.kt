@@ -1,14 +1,16 @@
-package ru.starfarm.spleef.game.bars
+package ru.starfarm.spleef.game.bar
 
 import org.bukkit.Bukkit
 import org.bukkit.boss.BarColor
 import org.bukkit.boss.BarStyle
+import ru.starfarm.core.util.format.ChatUtil
 import ru.starfarm.core.util.format.Formatter
 import ru.starfarm.spleef.game.GameInfo
 import ru.starfarm.spleef.game.GameStateType
 import ru.starfarm.spleef.player.SpleefPlayerInfo
 import java.time.Duration
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 /**
  * @author nolleNNN
@@ -23,8 +25,7 @@ class GameBar {
     fun removeBar(players: List<SpleefPlayerInfo>) = players.forEach { bar.removePlayer(it.player) }
 
     fun updateBar(gameInfo: GameInfo) {
-        val time =
-            Formatter.formatTimeText(Duration.between(Instant.now(), gameInfo.time).toMillis())
+        val time = Formatter.formatTimeText(Duration.between(Instant.now(), gameInfo.endStamp).toMillis());
 
         if (gameInfo.gameState == GameStateType.ENDING)
             setTitle("§aИгра окончена", true)

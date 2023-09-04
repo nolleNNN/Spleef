@@ -2,7 +2,6 @@ package ru.starfarm.spleef.player
 
 import org.bukkit.entity.Player
 import ru.starfarm.spleef.items.ItemService
-import java.util.*
 
 /**
  * @author nolleNNN
@@ -10,7 +9,6 @@ import java.util.*
  * @Time 20:57
  */
 data class SpleefPlayerInfo(
-    val uuid: UUID,
     val player: Player,
     val items: MutableMap<Int, Boolean>,
     var rating: Int = 0,
@@ -21,11 +19,12 @@ data class SpleefPlayerInfo(
 ) {
     private val buyItems get() = items.filter { it.value }.keys
     val gameAmount get() = wins + lose + draw
-    val percentWin get() = wins / lose
+    val percentWin get() = if (lose  == 0) 0 else wins / lose
 
     fun buyItem(id: Int) {
         items[id] = true
     }
 
-    fun addItem() = buyItems.forEach { player.inventory.addItem(ItemService.getItem(it)!!.getBuyItemStack()) }
+    fun addGameItem() = buyItems.forEach { player.inventory.addItem(ItemService.getItem(it)!!.getBuyItemStack()) }
+    fun removeGameItem() = buyItems.forEach { player.inventory.remove(ItemService.getItem(it)!!.getBuyItemStack()) }
 }

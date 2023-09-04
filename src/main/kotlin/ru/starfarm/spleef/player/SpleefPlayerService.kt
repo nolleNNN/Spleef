@@ -10,6 +10,9 @@ import ru.starfarm.core.util.serializer.Serializer
 import ru.starfarm.spleef.Database
 import ru.starfarm.spleef.DatabaseConnection
 import ru.starfarm.spleef.Plugin
+import ru.starfarm.spleef.game.lobby.leaderboard.TopPlayerService
+import ru.starfarm.spleef.game.lobby.util.moveToLobby
+import ru.starfarm.spleef.items.ItemService
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -25,7 +28,7 @@ import java.util.concurrent.TimeUnit
  * @Time 20:57
  */
 object SpleefPlayerService : BukkitRunnable() {
-    private val Players = mutableMapOf<UUID, SpleefPlayerInfo>()
+    private val Players = mutableMapOf<String, SpleefPlayerInfo>()
     private val items = object : TypeToken<ConcurrentMap<Int, Boolean>>() {}.type
     private val table = DatabaseConnection.getTable("spleef_players")
 
@@ -35,31 +38,31 @@ object SpleefPlayerService : BukkitRunnable() {
 
     fun load(uuid: UUID) = load(Bukkit.getPlayer(uuid))
 
-    private fun load(player: Player) {
+    fun load(player: Player) {
         table.newDatabaseQuery()
             .selectQuery()
-            .queryRow(ValueQueryRow("uuid", player.uniqueId))
+            .queryRow(ValueQueryRow("name", player.name))
             .executeQueryAsync(DatabaseConnection)
             .thenAccept {
                 val spleefPlayerInfo: SpleefPlayerInfo
                 if (!it.next()) {
                     table.newDatabaseQuery()
                         .insertQuery()
+                        .queryRow(ValueQueryRow("name", player.name))
                         .queryRow(ValueQueryRow("rating", 0))
                         .queryRow(ValueQueryRow("wins", 0))
                         .queryRow(ValueQueryRow("draw", 0))
                         .queryRow(ValueQueryRow("lose", 0))
                         .queryRow(ValueQueryRow("coins", 0))
-                        .queryRow(ValueQueryRow("items", mutableMapOf<Int, Boolean>()))
+                        .queryRow(ValueQueryRow("items", ItemService.playerItems))
                         .executeAsync(DatabaseConnection)
 
-                    spleefPlayerInfo = SpleefPlayerInfo(player.uniqueId, player, mutableMapOf())
+                    spleefPlayerInfo = SpleefPlayerInfo(player, ItemService.playerItems)
 
-                    Players[player.uniqueId] = spleefPlayerInfo
+                    Players[player.name] = spleefPlayerInfo
                     return@thenAccept
                 }
                 spleefPlayerInfo = SpleefPlayerInfo(
-                    player.uniqueId,
                     player,
                     Serializer.fromJson(it.getString("items"), items),
                     it.getInt("rating"),
@@ -68,24 +71,25 @@ object SpleefPlayerService : BukkitRunnable() {
                     it.getInt("lose"),
                     it.getInt("coins")
                 )
-
-                Players[player.uniqueId] = spleefPlayerInfo
+                Players[player.name] = spleefPlayerInfo
+                it.close()
             }
+        player.moveToLobby()
         loadScoreboard(player)
     }
 
-    fun unload(player: Player) = save(Players.remove(player.uniqueId)!!)
+    fun unload(player: Player) = save(Players.remove(player.name)!!)
 
     private fun save(spleefPlayerInfo: SpleefPlayerInfo) = Database.executeUpdate(
         false,
-        "UPDATE `${table.name}` SET `rating` = ?, `wins` = ?, `draw` = ?, `lose` = ?, `coins` = ?, `items` = ? WHERE `uuid` = ?",
+        "UPDATE `${table.name}` SET `rating` = ?, `wins` = ?, `draw` = ?, `lose` = ?, `coins` = ?, `items` = ? WHERE `name` = ?",
         spleefPlayerInfo.rating,
         spleefPlayerInfo.wins,
         spleefPlayerInfo.draw,
         spleefPlayerInfo.lose,
         spleefPlayerInfo.coins,
         Serializer.toJson(spleefPlayerInfo.items),
-        spleefPlayerInfo.uuid
+        spleefPlayerInfo.player.name
     )
 
     private fun loadScoreboard(player: Player) = ApiManager.newScoreboardBuilder().apply {
@@ -110,8 +114,8 @@ object SpleefPlayerService : BukkitRunnable() {
         setLine(3, "  §fМонет: ${spleefPlayer.coins}")
         setLine(2, "")
         setLine(1, "    §bwww.starfarm.fun")
-        addUpdater(20) { _, sb ->
-            sb.setLine(
+        addUpdater(20) { _, board ->
+            board.setLine(
                 11,
                 "§7${
                     LocalDateTime.ofInstant(
@@ -120,19 +124,19 @@ object SpleefPlayerService : BukkitRunnable() {
                     ).format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
                 }"
             )
-            sb.setLine(8, "  §fРейтинг: ${spleefPlayer.rating}")
-            sb.setLine(7, "  §fПобед: ${spleefPlayer.wins}")
-            sb.setLine(6, "  §fНичьи: ${spleefPlayer.draw}")
-            sb.setLine(5, "  §fПоражений: ${spleefPlayer.lose}")
-            sb.setLine(4, "  §fПроцент побед: ${spleefPlayer.percentWin}%")
-            sb.setLine(3, "  §fМонет: ${spleefPlayer.coins}")
-
+            board.setLine(8, "  §fРейтинг: ${spleefPlayer.rating}")
+            board.setLine(7, "  §fПобед: ${spleefPlayer.wins}")
+            board.setLine(6, "  §fНичьи: ${spleefPlayer.draw}")
+            board.setLine(5, "  §fПоражений: ${spleefPlayer.lose}")
+            board.setLine(4, "  §fПроцент побед: ${spleefPlayer.percentWin}%")
+            board.setLine(3, "  §fМонет: ${spleefPlayer.coins}")
         }
     }.build(player)
 
-    fun getSpleefPlayer(player: Player): SpleefPlayerInfo? = Players[player.uniqueId]
-    fun getSpleefPlayer(uuid: UUID): SpleefPlayerInfo? = Players[uuid]
-
-    override fun run() = Players.values.forEach { save(it) }
+    fun getSpleefPlayer(player: Player): SpleefPlayerInfo? = Players[player.name]
+    override fun run() {
+        TopPlayerService.updateTop()
+        Players.values.forEach { save(it) }
+    }
 
 }

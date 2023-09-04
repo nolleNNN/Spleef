@@ -1,5 +1,6 @@
 package ru.starfarm.spleef.npcs
 
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import ru.starfarm.core.entity.impl.FakePlayer
 import ru.starfarm.core.util.bukkit.LocationUtil
@@ -7,6 +8,7 @@ import ru.starfarm.core.util.format.ChatUtil
 import ru.starfarm.core.util.texture.skin.SkinUtil
 import ru.starfarm.spleef.DatabaseConnection
 import ru.starfarm.spleef.Logger
+import ru.starfarm.spleef.game.lobby.LobbyService
 
 /**
  * @author nolleNNN
@@ -32,6 +34,7 @@ object NpcService {
                     npcs[id] = npcInfo
                 }
                 Logger.info("Loaded ${npcs.size} NPCs")
+                it.close()
             }
     }
 
@@ -42,16 +45,23 @@ object NpcService {
 data class NpcInfo(
     private val name: String,
     private val location: Location,
-    private val skin: String,
+    private val npcSkin: String,
     private val fake: FakePlayer,
 ) {
     val fakePlayer get() = fake
 
     init {
         fake.apply {
-            customName = ChatUtil.color(name)
-            customNameVisible = true
+            hologram.textLine(0, "§7Сейчас в очереди: §b${LobbyService.players.size} §7игроков")
+            hologram.textLine(1, ChatUtil.color(name))
+            skin = SkinUtil.getSkin(npcSkin)!!
+            if (Bukkit.getOnlinePlayers().isNotEmpty())
+                look(Bukkit.getOnlinePlayers().first())
         }
     }
 
+}
+
+fun FakePlayer.updateName() {
+    hologram.textLine(0, "§7Сейчас в очереди: §b${LobbyService.players.size} §7игроков")
 }

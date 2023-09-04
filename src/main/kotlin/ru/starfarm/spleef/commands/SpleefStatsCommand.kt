@@ -17,7 +17,7 @@ import ru.starfarm.spleef.player.util.spleefPlayer
  */
 @BaseCommand("stats", "Показать статистику игрока")
 @BaseCommandPrefix(PREFIX)
-class SpleefStatsCommand : Command<Player>() {
+object SpleefStatsCommand : Command<Player>() {
     @BaseCommandParameter("Игрок", "Player", required = false)
     override fun execute(ctx: CommandContext<Player>) {
         val player = if (ctx.hasArg(0)) ctx.getArg<Player>(0)!!.spleefPlayer!! else ctx.sender.spleefPlayer!!
@@ -26,6 +26,6 @@ class SpleefStatsCommand : Command<Player>() {
         ctx.sendMessage("Количестов побед - ${player.wins}")
         ctx.sendMessage("Количестов поражений - ${player.lose}")
         ctx.sendMessage("Количество игр сыгранных в ничью - ${player.draw}")
-        ctx.sendMessage("Процент побед - ${player.percentWin}%")
+        ctx.sendMessage("Процент побед - ${player.percentWin}%%")
     }
 }
