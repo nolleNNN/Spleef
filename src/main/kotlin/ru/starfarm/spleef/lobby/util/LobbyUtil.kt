@@ -1,4 +1,4 @@
-package ru.starfarm.spleef.game.lobby.util
+package ru.starfarm.spleef.lobby.util
 
 import org.bukkit.GameMode
 import org.bukkit.Material

@@ -10,7 +10,7 @@ import ru.starfarm.core.util.format.ChatUtil
 import ru.starfarm.core.util.format.message.hover.HoverEventType
 import ru.starfarm.spleef.Task
 import ru.starfarm.spleef.game.Game
-import ru.starfarm.spleef.game.lobby.LobbyService
+import ru.starfarm.spleef.lobby.LobbyService
 import ru.starfarm.spleef.player.SpleefPlayerInfo
 import ru.starfarm.spleef.player.util.PREFIX
 import ru.starfarm.spleef.player.util.coloredName
@@ -24,6 +24,7 @@ import ru.starfarm.spleef.player.util.spleefPlayer
  */
 object SpleefDuelCommand : Command<Player>("duel", "Отправить дуэль игроку") {
     private val players = mutableMapOf<SpleefPlayerInfo, SpleefPlayerInfo>()
+
     init {
         prefix = PREFIX
 
@@ -35,6 +36,7 @@ object SpleefDuelCommand : Command<Player>("duel", "Отправить дуэл�
 
         addParameter("Игрок", TypePlayer(), true, PlayersCompleter())
     }
+
     override fun execute(ctx: CommandContext<Player>) {
         val sender = ctx.sender.spleefPlayer!!
         val target = ctx.getArg<Player>(0)!!.spleefPlayer!!
@@ -48,7 +50,8 @@ object SpleefDuelCommand : Command<Player>("duel", "Отправить дуэл�
 
         ctx.sendMessage("§aВы успешно отправили запрос на дуэль игроку ${target.player.coloredName}")
 
-        target.player.spigot().sendMessage(ChatMessageType.CHAT,
+        target.player.spigot().sendMessage(
+            ChatMessageType.CHAT,
             ChatUtil.newBuilder()
                 .text("§aНажмите, чтобы отказаться от дуэли!")
                 .hover(

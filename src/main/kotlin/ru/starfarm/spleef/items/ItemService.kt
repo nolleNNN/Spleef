@@ -9,7 +9,6 @@ import ru.starfarm.core.util.format.ChatUtil
 import ru.starfarm.spleef.DatabaseConnection
 import ru.starfarm.spleef.Logger
 import ru.starfarm.spleef.player.util.isSpade
-import java.util.stream.Collectors
 
 /**
  * @author nolleNNN

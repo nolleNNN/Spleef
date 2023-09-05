@@ -1,4 +1,4 @@
-package ru.starfarm.spleef.game.lobby.leaderboard
+package ru.starfarm.spleef.lobby.leaderboard
 
 import ru.starfarm.core.util.bukkit.LocationUtil
 import ru.starfarm.spleef.DatabaseConnection
@@ -43,3 +43,8 @@ object TopPlayerService {
     }
 
 }
+
+data class TopPlayer(
+    val rating: Int,
+    val kills: Int,
+)

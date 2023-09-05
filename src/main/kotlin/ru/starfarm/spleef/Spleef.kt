@@ -13,10 +13,11 @@ import ru.starfarm.map.service.IMapService
 import ru.starfarm.spleef.commands.SpleefCommand
 import ru.starfarm.spleef.commands.SpleefDuelCommand
 import ru.starfarm.spleef.commands.SpleefStatsCommand
-import ru.starfarm.spleef.game.lobby.LobbyService
 import ru.starfarm.spleef.items.ItemService
 import ru.starfarm.spleef.listeners.CancellerListener
 import ru.starfarm.spleef.listeners.LoaderListener
+import ru.starfarm.spleef.lobby.LobbyService
+import ru.starfarm.spleef.lobby.leaderboard.TopPlayerService
 import ru.starfarm.spleef.npcs.NpcService
 import ru.starfarm.spleef.player.SpleefPlayerService
 import java.util.logging.Logger
@@ -42,6 +43,7 @@ val DatabaseConnection by lazy {
 }
 val Database by lazy { DatabaseConnection.executeHandler }
 val MapService by lazy(IMapService::setup)
+
 class Spleef : CorePlugin() {
 
     override fun enable() {
@@ -50,6 +52,7 @@ class Spleef : CorePlugin() {
         NpcService
         SpleefPlayerService
         LobbyService
+        TopPlayerService
 
         registerListeners(
             LoaderListener, CancellerListener
@@ -66,10 +69,6 @@ class Spleef : CorePlugin() {
         Bukkit.getOnlinePlayers().forEach { SpleefPlayerService.unload(it) }
     }
 
-
-    private fun registerListeners(vararg listeners: Listener) {
-        for (listener in listeners)
-            Bukkit.getPluginManager().registerEvents(listener, this)
-    }
-
+    private fun registerListeners(vararg listeners: Listener) =
+        listeners.forEach { Bukkit.getPluginManager().registerEvents(it, this) }
 }

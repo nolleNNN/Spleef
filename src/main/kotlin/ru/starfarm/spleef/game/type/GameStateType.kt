@@ -1,4 +1,4 @@
-package ru.starfarm.spleef.game
+package ru.starfarm.spleef.game.type
 
 /**
  * @author nolleNNN

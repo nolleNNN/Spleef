@@ -1,4 +1,4 @@
-package ru.starfarm.spleef.game.lobby
+package ru.starfarm.spleef.lobby
 
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -9,15 +9,12 @@ import ru.starfarm.core.entity.type.Interact
 import ru.starfarm.core.event.on
 import ru.starfarm.spleef.Event
 import ru.starfarm.spleef.Task
-import ru.starfarm.spleef.game.Game
-import ru.starfarm.spleef.game.lobby.util.hasItemInMainHand
+import ru.starfarm.spleef.game.GameService
+import ru.starfarm.spleef.lobby.util.hasItemInMainHand
 import ru.starfarm.spleef.menu.ItemBuyMenu
 import ru.starfarm.spleef.npcs.NpcService
 import ru.starfarm.spleef.npcs.updateName
-import ru.starfarm.spleef.player.util.add
-import ru.starfarm.spleef.player.util.remove
-import ru.starfarm.spleef.player.util.sendPlayerMessage
-import java.util.concurrent.ThreadLocalRandom
+import ru.starfarm.spleef.player.util.*
 
 /**
  * @author nolleNNN
@@ -47,13 +44,12 @@ object LobbyService {
                 ItemBuyMenu().openInventory(player)
         }
         Task.everyAsync(20, 20) {
-            if (players.size >= 1) {
-//                val first = players.randomPlayer()
-//                val second = players.randomPlayer()
-//                clicks.removePlayer(first, second)
-                Game().startGame(players[0], players[0], maps[ThreadLocalRandom.current().nextInt(maps.size - 1)])
-                players.remove(players[0])
-                clicks.clear()
+            if (players.size >= 2) {
+                val first = players.randomPlayer()
+                val second = players.randomPlayer()
+                GameService.createGame(first, second)
+                players.removePlayer(first, second)
+                clicks.removePlayer(first, second)
             }
             NpcService.get(1)!!.fakePlayer.updateName()
         }

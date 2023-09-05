@@ -8,7 +8,7 @@ import ru.starfarm.core.util.format.ChatUtil
 import ru.starfarm.core.util.texture.skin.SkinUtil
 import ru.starfarm.spleef.DatabaseConnection
 import ru.starfarm.spleef.Logger
-import ru.starfarm.spleef.game.lobby.LobbyService
+import ru.starfarm.spleef.lobby.LobbyService
 
 /**
  * @author nolleNNN

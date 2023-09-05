@@ -19,7 +19,7 @@ data class SpleefPlayerInfo(
 ) {
     private val buyItems get() = items.filter { it.value }.keys
     val gameAmount get() = wins + lose + draw
-    val percentWin get() = if (lose  == 0) 0 else wins / lose
+    val percentWin get() = if (lose == 0) 0 else wins / lose
 
     fun buyItem(id: Int) {
         items[id] = true

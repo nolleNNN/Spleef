@@ -29,6 +29,7 @@ object SpleefCommand : Command<Player>("spleef", "Для работы с реж�
         }
 
     }
+
     override fun execute(ctx: CommandContext<Player>) {
         generateHelp(ctx.sender)
     }
@@ -39,12 +40,14 @@ object SpleefCommand : Command<Player>("spleef", "Для работы с реж�
             addParameter("Количество монет", TypeInteger())
             addParameter("Игрок", TypePlayer(), false, PlayersCompleter())
         }
+
         override fun execute(ctx: CommandContext<Player>) {
             val amount = ctx.getArg<Int>(0)
             val player = if (ctx.hasArg(1)) ctx.getArg<Player>(1)!! else ctx.sender
             player.spleefPlayer!!.coins += amount!!
-            ctx.sendMessage("§aВы успешно выдали §6$amount §aмонет " +
-                    if (player.name != ctx.sender.name) "игроку ${player.coloredName}" else "себе"
+            ctx.sendMessage(
+                "§aВы успешно выдали §6$amount §aмонет " +
+                        if (player.name != ctx.sender.name) "игроку ${player.coloredName}" else "себе"
             )
         }
     }

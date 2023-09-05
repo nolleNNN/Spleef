@@ -10,9 +10,9 @@ import ru.starfarm.core.util.serializer.Serializer
 import ru.starfarm.spleef.Database
 import ru.starfarm.spleef.DatabaseConnection
 import ru.starfarm.spleef.Plugin
-import ru.starfarm.spleef.game.lobby.leaderboard.TopPlayerService
-import ru.starfarm.spleef.game.lobby.util.moveToLobby
 import ru.starfarm.spleef.items.ItemService
+import ru.starfarm.spleef.lobby.leaderboard.TopPlayerService
+import ru.starfarm.spleef.lobby.util.moveToLobby
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId

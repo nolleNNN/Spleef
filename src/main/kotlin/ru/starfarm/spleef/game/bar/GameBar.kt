@@ -3,19 +3,16 @@ package ru.starfarm.spleef.game.bar
 import org.bukkit.Bukkit
 import org.bukkit.boss.BarColor
 import org.bukkit.boss.BarStyle
-import ru.starfarm.core.util.format.ChatUtil
 import ru.starfarm.core.util.format.Formatter
-import ru.starfarm.spleef.game.GameInfo
-import ru.starfarm.spleef.game.GameStateType
+import ru.starfarm.spleef.game.type.GameStateType
 import ru.starfarm.spleef.player.SpleefPlayerInfo
 import java.time.Duration
 import java.time.Instant
-import java.util.concurrent.TimeUnit
 
 /**
  * @author nolleNNN
- * @Date 02.09.2023
- * @Time 22:33
+ * @Date 05.09.2023
+ * @Time 19:46
  */
 class GameBar {
     private val bar = Bukkit.createBossBar("", BarColor.WHITE, BarStyle.SOLID)
@@ -24,10 +21,10 @@ class GameBar {
 
     fun removeBar(players: List<SpleefPlayerInfo>) = players.forEach { bar.removePlayer(it.player) }
 
-    fun updateBar(gameInfo: GameInfo) {
-        val time = Formatter.formatTimeText(Duration.between(Instant.now(), gameInfo.endStamp).toMillis());
+    fun updateBar(endStamp: Instant, gameStateType: GameStateType) {
+        val time = Formatter.formatTimeText(Duration.between(Instant.now(), endStamp).toMillis())
 
-        if (gameInfo.gameState == GameStateType.ENDING)
+        if (gameStateType == GameStateType.ENDING)
             setTitle("§aИгра окончена", true)
         else
             setTitle("§fДо конца игры: §6$time", false)
