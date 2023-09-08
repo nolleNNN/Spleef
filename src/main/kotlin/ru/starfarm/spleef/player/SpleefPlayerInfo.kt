@@ -19,12 +19,12 @@ data class SpleefPlayerInfo(
 ) {
     private val buyItems get() = items.filter { it.value }.keys
     val gameAmount get() = wins + lose + draw
-    val percentWin get() = if (lose == 0) 0 else wins / lose
+    val percentWin get() = if (lose == 0) 0 else (wins / gameAmount) * 100
 
     fun buyItem(id: Int) {
         items[id] = true
     }
 
-    fun addGameItem() = buyItems.forEach { player.inventory.addItem(ItemService.getItem(it)!!.getBuyItemStack()) }
-    fun removeGameItem() = buyItems.forEach { player.inventory.remove(ItemService.getItem(it)!!.getBuyItemStack()) }
+    fun addGameItem() = buyItems.forEach { player.inventory.addItem(ItemService.getItem(it)!!.buyItemStack) }
+    fun removeGameItem() = buyItems.forEach { player.inventory.remove(ItemService.getItem(it)!!.buyItemStack) }
 }

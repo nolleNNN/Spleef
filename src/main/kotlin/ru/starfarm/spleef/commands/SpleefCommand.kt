@@ -7,7 +7,7 @@ import ru.starfarm.core.command.patameter.tab.PlayersCompleter
 import ru.starfarm.core.command.require.Require
 import ru.starfarm.core.command.type.TypeInteger
 import ru.starfarm.core.command.type.TypePlayer
-import ru.starfarm.spleef.player.util.PREFIX
+import ru.starfarm.spleef.player.util.Prefix
 import ru.starfarm.spleef.player.util.coloredName
 import ru.starfarm.spleef.player.util.spleefPlayer
 
@@ -19,13 +19,13 @@ import ru.starfarm.spleef.player.util.spleefPlayer
 object SpleefCommand : Command<Player>("spleef", "Для работы с режимом", "s", "sp") {
 
     init {
-        prefix = PREFIX
+        prefix = Prefix
 
         addCommand(GiveMoneyCommand)
 
         commands.forEach {
             it.prefix = prefix
-            it.addRequire(Require.Companion.permission("*"))
+            it.addRequire(Require.permission("*"))
         }
 
     }

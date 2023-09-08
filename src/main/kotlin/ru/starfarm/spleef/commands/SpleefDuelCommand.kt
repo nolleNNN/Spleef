@@ -9,10 +9,9 @@ import ru.starfarm.core.command.type.TypePlayer
 import ru.starfarm.core.util.format.ChatUtil
 import ru.starfarm.core.util.format.message.hover.HoverEventType
 import ru.starfarm.spleef.Task
-import ru.starfarm.spleef.game.Game
-import ru.starfarm.spleef.lobby.LobbyService
+import ru.starfarm.spleef.game.GameService
 import ru.starfarm.spleef.player.SpleefPlayerInfo
-import ru.starfarm.spleef.player.util.PREFIX
+import ru.starfarm.spleef.player.util.Prefix
 import ru.starfarm.spleef.player.util.coloredName
 import ru.starfarm.spleef.player.util.sendPlayerMessage
 import ru.starfarm.spleef.player.util.spleefPlayer
@@ -26,7 +25,7 @@ object SpleefDuelCommand : Command<Player>("duel", "Отправить дуэл�
     private val players = mutableMapOf<SpleefPlayerInfo, SpleefPlayerInfo>()
 
     init {
-        prefix = PREFIX
+        prefix = Prefix
 
         addCommand(SpleefDenyDuelCommand)
 
@@ -69,7 +68,7 @@ object SpleefDuelCommand : Command<Player>("duel", "Отправить дуэл�
                 return@everyAsync
             }
             if (it.periods >= 10) {
-                Game().startGame(sender.player, target.player, LobbyService.maps[0])
+                GameService.createGame(sender.player, target.player)
                 it.cancel()
                 return@everyAsync
             }

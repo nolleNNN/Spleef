@@ -11,7 +11,6 @@ import ru.starfarm.spleef.Database
 import ru.starfarm.spleef.DatabaseConnection
 import ru.starfarm.spleef.Plugin
 import ru.starfarm.spleef.items.ItemService
-import ru.starfarm.spleef.lobby.leaderboard.TopPlayerService
 import ru.starfarm.spleef.lobby.util.moveToLobby
 import java.time.Instant
 import java.time.LocalDateTime
@@ -28,9 +27,9 @@ import java.util.concurrent.TimeUnit
  * @Time 20:57
  */
 object SpleefPlayerService : BukkitRunnable() {
-    private val Players = mutableMapOf<String, SpleefPlayerInfo>()
-    private val items = object : TypeToken<ConcurrentMap<Int, Boolean>>() {}.type
-    private val table = DatabaseConnection.getTable("spleef_players")
+    private val players = mutableMapOf<String, SpleefPlayerInfo>()
+    private val Items = object : TypeToken<ConcurrentMap<Int, Boolean>>() {}.type
+    private val Table = DatabaseConnection.getTable("spleef_players")
 
     init {
         runTaskTimerAsynchronously(Plugin, 1L, 20L * TimeUnit.MINUTES.toSeconds(5))
@@ -39,14 +38,14 @@ object SpleefPlayerService : BukkitRunnable() {
     fun load(uuid: UUID) = load(Bukkit.getPlayer(uuid))
 
     fun load(player: Player) {
-        table.newDatabaseQuery()
+        Table.newDatabaseQuery()
             .selectQuery()
             .queryRow(ValueQueryRow("name", player.name))
             .executeQueryAsync(DatabaseConnection)
             .thenAccept {
                 val spleefPlayerInfo: SpleefPlayerInfo
                 if (!it.next()) {
-                    table.newDatabaseQuery()
+                    Table.newDatabaseQuery()
                         .insertQuery()
                         .queryRow(ValueQueryRow("name", player.name))
                         .queryRow(ValueQueryRow("rating", 0))
@@ -59,30 +58,30 @@ object SpleefPlayerService : BukkitRunnable() {
 
                     spleefPlayerInfo = SpleefPlayerInfo(player, ItemService.playerItems)
 
-                    Players[player.name] = spleefPlayerInfo
+                    players[player.name] = spleefPlayerInfo
                     return@thenAccept
                 }
                 spleefPlayerInfo = SpleefPlayerInfo(
                     player,
-                    Serializer.fromJson(it.getString("items"), items),
+                    Serializer.fromJson(it.getString("items"), Items),
                     it.getInt("rating"),
                     it.getInt("wins"),
                     it.getInt("draw"),
                     it.getInt("lose"),
                     it.getInt("coins")
                 )
-                Players[player.name] = spleefPlayerInfo
+                players[player.name] = spleefPlayerInfo
                 it.close()
             }
         player.moveToLobby()
         loadScoreboard(player)
     }
 
-    fun unload(player: Player) = save(Players.remove(player.name)!!)
+    fun unload(player: Player) = save(players.remove(player.name)!!)
 
     private fun save(spleefPlayerInfo: SpleefPlayerInfo) = Database.executeUpdate(
         false,
-        "UPDATE `${table.name}` SET `rating` = ?, `wins` = ?, `draw` = ?, `lose` = ?, `coins` = ?, `items` = ? WHERE `name` = ?",
+        "UPDATE `${Table.name}` SET `rating` = ?, `wins` = ?, `draw` = ?, `lose` = ?, `coins` = ?, `items` = ? WHERE `name` = ?",
         spleefPlayerInfo.rating,
         spleefPlayerInfo.wins,
         spleefPlayerInfo.draw,
@@ -133,10 +132,9 @@ object SpleefPlayerService : BukkitRunnable() {
         }
     }.build(player)
 
-    fun getSpleefPlayer(player: Player): SpleefPlayerInfo? = Players[player.name]
+    fun getSpleefPlayer(player: Player): SpleefPlayerInfo? = players[player.name]
     override fun run() {
-        TopPlayerService.updateTop()
-        Players.values.forEach { save(it) }
+        players.values.forEach { save(it) }
     }
 
 }

@@ -13,11 +13,11 @@ import ru.starfarm.map.service.IMapService
 import ru.starfarm.spleef.commands.SpleefCommand
 import ru.starfarm.spleef.commands.SpleefDuelCommand
 import ru.starfarm.spleef.commands.SpleefStatsCommand
+import ru.starfarm.spleef.game.GameService
 import ru.starfarm.spleef.items.ItemService
 import ru.starfarm.spleef.listeners.CancellerListener
 import ru.starfarm.spleef.listeners.LoaderListener
 import ru.starfarm.spleef.lobby.LobbyService
-import ru.starfarm.spleef.lobby.leaderboard.TopPlayerService
 import ru.starfarm.spleef.npcs.NpcService
 import ru.starfarm.spleef.player.SpleefPlayerService
 import java.util.logging.Logger
@@ -52,7 +52,7 @@ class Spleef : CorePlugin() {
         NpcService
         SpleefPlayerService
         LobbyService
-        TopPlayerService
+        GameService
 
         registerListeners(
             LoaderListener, CancellerListener

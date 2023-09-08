@@ -6,12 +6,11 @@ import org.bukkit.event.player.PlayerQuitEvent
 import ru.starfarm.core.event.on
 import ru.starfarm.map.world.LoadedWorld
 import ru.starfarm.spleef.game.bar.GameBar
-import ru.starfarm.spleef.game.type.GameStateType
+import ru.starfarm.spleef.game.type.GameStageType
 import ru.starfarm.spleef.game.util.unloadWorld
 import ru.starfarm.spleef.lobby.util.moveToLobby
 import ru.starfarm.spleef.player.SpleefPlayerInfo
 import ru.starfarm.spleef.player.util.sendPlayerTitle
-import ru.starfarm.spleef.player.util.spleefPlayer
 import java.time.Duration
 import java.time.Instant
 
@@ -27,25 +26,46 @@ class Game(
     private val mapId: String,
     private val map: LoadedWorld,
 ) : GameStage() {
+    init {
+        waitingStage()
+    }
     private val players get() = mutableListOf(firstPlayer, secondPlayer)
     private val zone get() = map.getCuboid(mapId)
-    private val firstLocation get() = map.getPoint("firstLocation")
-    private val secondLocation get() = map.getPoint("secondLocation")
+    private val firstLocation get() = map.getPoint(mapId,"firstLocation")
+    private val secondLocation get() = map.getPoint(mapId, "secondLocation")
     override fun waitingStage() {
+        firstPlayer.player.teleport(firstLocation)
+        secondPlayer.player.teleport(secondLocation)
         var time = 3
-        taskContext.everyAsync(20, 20) {
+        taskContext.everyAsync(20, 20) {task ->
+            if (time == 0) {
+                players.forEach {
+                    it.addGameItem()
+                    it.player.gameMode = GameMode.SURVIVAL
+                    players.remove(it)
+                }
+                startStage()
+                task.cancel()
+                return@everyAsync
+            }
             players.forEach {
                 it.player.sendPlayerTitle("До начала игры осталось", "$time")
             }
             time--
         }
-        startStage()
+        taskContext.everyAsync(1, 1) {
+            if (time == 0) {
+                it.cancel()
+                return@everyAsync
+            }
+            firstPlayer.player.teleport(firstLocation)
+            secondPlayer.player.teleport(secondLocation)
+        }
     }
 
     override fun startStage() {
-        firstPlayer.player.teleport(firstLocation)
-        secondPlayer.player.teleport(secondLocation)
         gameBar.addBar(players)
+        changeGameType(GameStageType.RUNNING)
         runStage()
     }
 
@@ -54,17 +74,17 @@ class Game(
         taskContext.everyAsync(20, 20) {
             if (Instant.now().isAfter(endStamp)) {
                 drawGame(players)
-                changeGameType(GameStateType.ENDING)
+                changeGameType(GameStageType.ENDING)
                 it.cancel()
                 return@everyAsync
             }
             gameBar.updateBar(endStamp, stateType)
         }
-        eventContext.on<PlayerQuitEvent> { leaveGame(player.spleefPlayer!!) }
+        eventContext.on<PlayerQuitEvent> { leaveGame(players) }
         eventContext.on<PlayerMoveEvent> {
-            if (zone!!.contains(player) && stateType != GameStateType.ENDING) {
+            if (zone!!.contains(player) && stateType != GameStageType.ENDING) {
                 player.gameMode = GameMode.SPECTATOR
-                changeGameType(GameStateType.ENDING)
+                changeGameType(GameStageType.ENDING)
                 winGame(players)
             }
         }
@@ -74,6 +94,7 @@ class Game(
         gameBar.removeBar(players)
         players.forEach {
             it.player.moveToLobby()
+            players.remove(it)
         }
         map.unloadWorld()
     }

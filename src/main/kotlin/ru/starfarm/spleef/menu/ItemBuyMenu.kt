@@ -15,16 +15,16 @@ import ru.starfarm.spleef.player.util.spleefPlayer
  */
 class ItemBuyMenu : InventoryContainer("Покупка предметов", 3) {
     override fun drawInventory(player: Player) {
-        val spleefPlayer = player.spleefPlayer!!
+        val spleefPlayer = player.spleefPlayer
 
-        spleefPlayer.items.forEach { (id, has) ->
+        spleefPlayer?.items?.forEach { (id, has) ->
             val item = ItemService.getItem(id)!!
 
             val buyItem = if (has) ApiManager.buildItem(item.material) {
                 it.name = "§b${item.name}"
                 it.addLore("", "§aВы успешно приобрели", "§aданный предмет!")
                 it.addItemFlags(*ItemFlag.values())
-            } else item.getItemStack()
+            } else item.itemStack
 
             addItem(id - 1, buyItem) { _, _ ->
                 if (has) {

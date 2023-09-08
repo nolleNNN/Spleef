@@ -4,7 +4,7 @@ import org.bukkit.Bukkit
 import org.bukkit.boss.BarColor
 import org.bukkit.boss.BarStyle
 import ru.starfarm.core.util.format.Formatter
-import ru.starfarm.spleef.game.type.GameStateType
+import ru.starfarm.spleef.game.type.GameStageType
 import ru.starfarm.spleef.player.SpleefPlayerInfo
 import java.time.Duration
 import java.time.Instant
@@ -21,10 +21,10 @@ class GameBar {
 
     fun removeBar(players: List<SpleefPlayerInfo>) = players.forEach { bar.removePlayer(it.player) }
 
-    fun updateBar(endStamp: Instant, gameStateType: GameStateType) {
+    fun updateBar(endStamp: Instant, gameStageType: GameStageType) {
         val time = Formatter.formatTimeText(Duration.between(Instant.now(), endStamp).toMillis())
 
-        if (gameStateType == GameStateType.ENDING)
+        if (gameStageType == GameStageType.ENDING)
             setTitle("§aИгра окончена", true)
         else
             setTitle("§fДо конца игры: §6$time", false)

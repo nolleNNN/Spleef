@@ -3,7 +3,6 @@ package ru.starfarm.spleef.items
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemFlag
-import org.bukkit.inventory.ItemStack
 import ru.starfarm.core.ApiManager
 import ru.starfarm.core.util.format.ChatUtil
 import ru.starfarm.spleef.DatabaseConnection
@@ -16,9 +15,9 @@ import ru.starfarm.spleef.player.util.isSpade
  * @Time 20:21
  */
 object ItemService {
-    private val items = mutableMapOf<Int, ItemInfo>()
+    private val items = hashMapOf<Int, ItemInfo>()
 
-    val playerItems get() = items.values.associate { it.id to false }.toMutableMap()
+    val playerItems = items.values.associate { it.id to false }.toMutableMap()
 
     init {
         DatabaseConnection
@@ -51,19 +50,20 @@ data class ItemInfo(
     val material: Material,
 ) {
 
-    fun getItemStack(): ItemStack = ApiManager.buildItem(material) {
-        it.name = ChatUtil.color("§f$name")
-        val loreStr = lore.split("\\n\\r")
-        for (str in loreStr) it.addLore(ChatUtil.color(str))
-        it.addLore("", "§bЦена: §6$price §bкоинов.")
-        it.addItemFlags(*ItemFlag.values())
-    }
+    val itemStack
+        get() = ApiManager.buildItem(material) {
+            it.name = ChatUtil.color("§f$name")
+            for (itemLore in lore.lines()) it.addLore(ChatUtil.color(itemLore))
+            it.addLore("", "§bЦена: §6$price §bкоинов.")
+            it.addItemFlags(*ItemFlag.values())
+        }
 
-    fun getBuyItemStack(): ItemStack = ApiManager.buildItem(material) {
-        it.name = ChatUtil.color("§f$name")
-        it.addItemFlags(*ItemFlag.values())
-        it.unbreakable(true)
-        if (material.isSpade) it.enchant(Enchantment.DIG_SPEED, 10)
-    }
+    val buyItemStack
+        get() = ApiManager.buildItem(material) {
+            it.name = ChatUtil.color("§f$name")
+            it.addItemFlags(*ItemFlag.values())
+            it.unbreakable(true)
+            if (material.isSpade) it.enchant(Enchantment.DIG_SPEED, 10)
+        }
 
 }

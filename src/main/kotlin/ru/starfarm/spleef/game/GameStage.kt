@@ -1,13 +1,12 @@
 package ru.starfarm.spleef.game
 
-import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import ru.starfarm.spleef.Event
 import ru.starfarm.spleef.Task
-import ru.starfarm.spleef.game.type.GameStateType
+import ru.starfarm.spleef.game.type.GameStageType
 import ru.starfarm.spleef.lobby.util.moveToLobby
 import ru.starfarm.spleef.player.SpleefPlayerInfo
-import ru.starfarm.spleef.player.util.spleefPlayer
+import ru.starfarm.spleef.player.util.sendPlayerMessage
 
 /**
  * @author nolleNNN
@@ -17,7 +16,7 @@ import ru.starfarm.spleef.player.util.spleefPlayer
 abstract class GameStage {
     val taskContext = Task.fork(true)
     val eventContext = Event.fork(true)
-    var stateType: GameStateType = GameStateType.WAITING
+    var stateType = GameStageType.WAITING
     abstract fun waitingStage()
     abstract fun startStage()
     abstract fun runStage()
@@ -30,27 +29,36 @@ abstract class GameStage {
                 if (it.rating - 5 < 0) it.rating = 0
                 else it.rating -= 5
                 it.coins += 5
+                it.player.sendPlayerMessage("§aВы проиграли и потеряли §65 §aрейтинга и получили §65 §aмонет")
+                it.player.moveToLobby()
             } else {
                 it.wins++
                 it.rating += 5
                 it.coins += 15
+                it.player.moveToLobby()
+                it.player.sendPlayerMessage("§aВы победили и получили §65 §aрейтинга и §615 §aмонет")
             }
-            it.player.moveToLobby()
+            players.remove(it)
         }
         close()
     }
 
-    fun leaveGame(leaver: SpleefPlayerInfo) {
-        leaver.lose++
-        if (leaver.rating - 5 < 0) leaver.rating = 0
-        else leaver.rating -= 5
-        leaver.coins += 5
-
-        val winner = Bukkit.getWorld(leaver.player.world.name).players.first { it != leaver.player }.spleefPlayer!!
-        winner.wins++
-        winner.rating += 5
-        winner.coins += 15
-        winner.player.moveToLobby()
+    fun leaveGame(players: MutableList<SpleefPlayerInfo>) {
+        players.forEach {
+            if (!it.player.isOnline) {
+                it.lose++
+                if (it.rating - 5 < 0) it.rating = 0
+                else it.rating -= 5
+                it.coins += 5
+            } else {
+                it.wins++
+                it.rating += 5
+                it.coins += 15
+                it.player.moveToLobby()
+                it.player.sendPlayerMessage("§aВы победили, так как противник покинул игру, и получили §65 §aрейтинга и §615 §aмонет")
+            }
+            players.remove(it)
+        }
         close()
     }
 
@@ -59,13 +67,15 @@ abstract class GameStage {
             it.draw++
             it.coins += 10
             it.player.moveToLobby()
+            it.player.sendPlayerMessage("§aНикто не победил!")
+            players.remove(it)
         }
         close()
     }
 
-    fun changeGameType(gameStateType: GameStateType) {
-        stateType = gameStateType
-        if (stateType == GameStateType.ENDING) endStage()
+    fun changeGameType(gameStageType: GameStageType) {
+        stateType = gameStageType
+        if (stateType == GameStageType.ENDING) endStage()
     }
 
     private fun close() {

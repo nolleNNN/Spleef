@@ -1,11 +1,10 @@
 package ru.starfarm.spleef.npcs
 
-import org.bukkit.Bukkit
 import org.bukkit.Location
-import ru.starfarm.core.entity.impl.FakePlayer
+import ru.starfarm.core.ApiManager
+import ru.starfarm.core.entity.impl.FakeVillager
 import ru.starfarm.core.util.bukkit.LocationUtil
 import ru.starfarm.core.util.format.ChatUtil
-import ru.starfarm.core.util.texture.skin.SkinUtil
 import ru.starfarm.spleef.DatabaseConnection
 import ru.starfarm.spleef.Logger
 import ru.starfarm.spleef.lobby.LobbyService
@@ -16,7 +15,7 @@ import ru.starfarm.spleef.lobby.LobbyService
  * @Time 20:43
  */
 object NpcService {
-    private val npcs = mutableMapOf<Int, NpcInfo>()
+    private val npcs = hashMapOf<Int, NpcInfo>()
 
     init {
         DatabaseConnection
@@ -28,9 +27,8 @@ object NpcService {
                     val id = it.getInt("id")
                     val name = it.getString("name")
                     val location = LocationUtil.fromString(it.getString("location"))
-                    val skin = it.getString("skin")
-                    val fakePlayer = FakePlayer(SkinUtil.getSkin(skin)!!, location)
-                    val npcInfo = NpcInfo(name, location, skin, fakePlayer)
+                    val fakeVillager = FakeVillager(location)
+                    val npcInfo = NpcInfo(name, location, fakeVillager)
                     npcs[id] = npcInfo
                 }
                 Logger.info("Loaded ${npcs.size} NPCs")
@@ -45,23 +43,13 @@ object NpcService {
 data class NpcInfo(
     private val name: String,
     private val location: Location,
-    private val npcSkin: String,
-    private val fake: FakePlayer,
+    private val fake: FakeVillager,
 ) {
-    val fakePlayer get() = fake
-
-    init {
-        fake.apply {
-            hologram.textLine(0, "§7Сейчас в очереди: §b${LobbyService.players.size} §7игроков")
-            hologram.textLine(1, ChatUtil.color(name))
-            skin = SkinUtil.getSkin(npcSkin)!!
-            if (Bukkit.getOnlinePlayers().isNotEmpty())
-                look(Bukkit.getOnlinePlayers().first())
-        }
+    val fakeVillager get() = fake
+    private val holo = ApiManager.createHologram(fakeVillager.location.clone().add(.0, 2.25, .0)).apply {
+        textLine(0, "§7Сейчас в очереди: §b${LobbyService.size} §7игроков")
+        textLine(1, ChatUtil.color(name))
     }
 
-}
-
-fun FakePlayer.updateName() {
-    hologram.textLine(0, "§7Сейчас в очереди: §b${LobbyService.players.size} §7игроков")
+    fun update() = holo.textLine(0, "§7Сейчас в очереди: §b${LobbyService.size} §7игроков")
 }

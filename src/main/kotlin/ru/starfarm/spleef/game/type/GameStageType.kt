@@ -5,6 +5,6 @@ package ru.starfarm.spleef.game.type
  * @Date 02.09.2023
  * @Time 22:29
  */
-enum class GameStateType {
+enum class GameStageType {
     WAITING, RUNNING, ENDING
 }
