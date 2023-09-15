@@ -5,6 +5,7 @@ import org.bukkit.event.player.PlayerQuitEvent
 import ru.starfarm.core.event.GlobalEventContext.on
 import ru.starfarm.core.util.format.ChatUtil
 import ru.starfarm.core.util.number.NumberUtil
+import ru.starfarm.spleef.lobby.util.moveToLobby
 import ru.starfarm.spleef.lobby.util.moveToWaitingLobby
 import ru.starfarm.spleef.player.SpleefPlayerInfo
 import ru.starfarm.spleef.player.util.coloredName
@@ -32,7 +33,10 @@ class LobbyStage(private val first: SpleefPlayerInfo, private val second: Spleef
     override fun tickStage() {
         taskContext.everyAsync(20, 20) {
             if (players.size <= 1) {
-                time = 10
+                players.forEach {
+                    it.moveToLobby()
+                    it.sendPlayerMessage("§cВаш оппонент покинул игру! Возвращаем вас в лобби!")
+                }
                 return@everyAsync
             }
             if (time == 0) {

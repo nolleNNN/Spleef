@@ -21,7 +21,6 @@ import ru.starfarm.spleef.test.Game
 object LobbyService {
     private val clicks = hashSetOf<Player>()
     private val players = hashSetOf<Player>()
-    private val Maps = listOf("first", "second")
     val size get() = players.size
 
     init {
@@ -39,7 +38,6 @@ object LobbyService {
             if (size >= 2) {
                 val first = players.first()
                 val second = players.last()
-//                GameService.createGame(first, second)
                 Game(first.spleefPlayer!!, second.spleefPlayer!!)
                 players.removePlayer(first, second)
                 clicks.removePlayer(first, second)
