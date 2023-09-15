@@ -16,7 +16,7 @@ import ru.starfarm.spleef.player.util.spleefPlayer
  * @Time 14:18
  */
 val LobbyLocation = LocationUtil.fromString("world 243 66 290")
-val Maps = listOf("first", "second")
+val WaitingLobbyLocation = LocationUtil.fromString("world 250 66 300")
 val BuyItem = ApiManager.buildItem(Material.PAPER) {
     it.name = "§fПокупка предметов"
     it.addLore(
@@ -28,10 +28,14 @@ val BuyItem = ApiManager.buildItem(Material.PAPER) {
 }
 
 fun Player.moveToLobby() {
-    gameMode = GameMode.ADVENTURE
+    gameMode = GameMode.SURVIVAL
     teleport(LobbyLocation)
-    player.spleefPlayer!!.removeGameItem()
+    player.spleefPlayer?.removeGameItem()
     addLobbyItem()
+}
+
+fun Player.moveToWaitingLobby() {
+    teleport(WaitingLobbyLocation)
 }
 
 fun Player.addLobbyItem() = player.inventory.addItem(BuyItem)!!

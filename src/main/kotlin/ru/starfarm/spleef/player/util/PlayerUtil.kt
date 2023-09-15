@@ -1,6 +1,5 @@
 package ru.starfarm.spleef.player.util
 
-import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import ru.starfarm.core.ApiManager
@@ -21,9 +20,7 @@ fun Player.sendPlayerMessage(message: String) = sendMessage("$Prefix$message")
 fun Player.sendPlayerTitle(upperMessage: String, lowerMessage: String) =
     sendTitle(ChatUtil.color(upperMessage), ChatUtil.color(lowerMessage), 10, 20, 10)
 
-fun MutableList<Player>.removePlayer(vararg players: Player) = players.forEach { remove(it) }
 fun MutableSet<Player>.removePlayer(vararg players: Player) = players.forEach { remove(it) }
-fun String.toPlayer(): Player? = if (Bukkit.getPlayer(this) != null) Bukkit.getPlayer(this) else null
 fun Player.remove(players: HashSet<Player>, clicks: HashSet<Player>) {
     players.remove(this)
     clicks.remove(this)

@@ -35,8 +35,6 @@ object SpleefPlayerService : BukkitRunnable() {
         runTaskTimerAsynchronously(Plugin, 1L, 20L * TimeUnit.MINUTES.toSeconds(5))
     }
 
-    fun load(uuid: UUID) = load(Bukkit.getPlayer(uuid))
-
     fun load(player: Player) {
         Table.newDatabaseQuery()
             .selectQuery()
@@ -133,8 +131,7 @@ object SpleefPlayerService : BukkitRunnable() {
     }.build(player)
 
     fun getSpleefPlayer(player: Player): SpleefPlayerInfo? = players[player.name]
-    override fun run() {
-        players.values.forEach { save(it) }
-    }
+    override fun run() = players.values.forEach { save(it) }
+
 
 }

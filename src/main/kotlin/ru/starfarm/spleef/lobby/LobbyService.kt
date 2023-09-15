@@ -7,11 +7,11 @@ import ru.starfarm.core.entity.PlayerInteractFakeEntityEvent
 import ru.starfarm.core.entity.type.Interact
 import ru.starfarm.core.event.on
 import ru.starfarm.spleef.Event
-import ru.starfarm.spleef.game.GameService
 import ru.starfarm.spleef.lobby.util.hasItemInMainHand
 import ru.starfarm.spleef.menu.ItemBuyMenu
 import ru.starfarm.spleef.npcs.NpcService
 import ru.starfarm.spleef.player.util.*
+import ru.starfarm.spleef.test.Game
 
 /**
  * @author nolleNNN
@@ -39,7 +39,8 @@ object LobbyService {
             if (size >= 2) {
                 val first = players.first()
                 val second = players.last()
-                GameService.createGame(first, second)
+//                GameService.createGame(first, second)
+                Game(first.spleefPlayer!!, second.spleefPlayer!!)
                 players.removePlayer(first, second)
                 clicks.removePlayer(first, second)
             }
