@@ -26,4 +26,7 @@ object GameService {
     }
 
     fun getGame(uuid: UUID) = games[uuid]
+
+    fun removeGame(uuid: UUID): GameStage? = games.remove(uuid)
+
 }

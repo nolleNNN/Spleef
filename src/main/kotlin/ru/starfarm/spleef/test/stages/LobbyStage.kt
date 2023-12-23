@@ -1,6 +1,6 @@
 package ru.starfarm.spleef.test.stages
 
-import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.Bukkit
 import org.bukkit.event.player.PlayerQuitEvent
 import ru.starfarm.core.event.GlobalEventContext.on
 import ru.starfarm.core.util.format.ChatUtil
@@ -47,15 +47,12 @@ class LobbyStage(private val first: SpleefPlayerInfo, private val second: Spleef
                 players.forEach { it.sendPlayerMessage("§aДо начала игры осталось §6${NumberUtil.getTime(time)}") }
             time--
         }
-        eventContext.on<PlayerJoinEvent> {
-            joinMessage = null
-            ChatUtil.broadcast("§aИгрок ${player.coloredName} §aприсоединился к игре!")
-            players.add(player)
-        }
         eventContext.on<PlayerQuitEvent> {
             quitMessage = null
             ChatUtil.broadcast("§cИгрок ${player.coloredName} §cпокинул игру!")
-            players.remove(player)
+            ChatUtil.broadcast("§cВозвращаем вас в лобби...")
+            Bukkit.getOnlinePlayers().forEach { it.moveToLobby() }
+            players.clear()
         }
     }
 

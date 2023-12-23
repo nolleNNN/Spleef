@@ -20,9 +20,9 @@ val WaitingLobbyLocation = LocationUtil.fromString("world 250 66 300")
 val BuyItem = ApiManager.buildItem(Material.PAPER) {
     it.name = "§fПокупка предметов"
     it.addLore(
-        "",
-        "§aНажмите, чтобы приобрести",
-        "§aразличные игровые предметы!"
+            "",
+            "§aНажмите, чтобы приобрести",
+            "§aразличные игровые предметы!"
     )
     it.addItemFlags(*ItemFlag.values())
 }
@@ -34,9 +34,8 @@ fun Player.moveToLobby() {
     addLobbyItem()
 }
 
-fun Player.moveToWaitingLobby() {
-    teleport(WaitingLobbyLocation)
-}
+fun Player.moveToWaitingLobby() = teleport(WaitingLobbyLocation)
+
 
 fun Player.addLobbyItem() = player.inventory.addItem(BuyItem)!!
 

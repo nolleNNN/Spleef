@@ -19,7 +19,7 @@ import ru.starfarm.spleef.listeners.CancellerListener
 import ru.starfarm.spleef.listeners.LoaderListener
 import ru.starfarm.spleef.lobby.LobbyService
 import ru.starfarm.spleef.npcs.NpcService
-import ru.starfarm.spleef.player.SpleefPlayerService
+import ru.starfarm.spleef.service.ServiceManager
 import java.util.logging.Logger
 
 /**
@@ -50,9 +50,9 @@ class Spleef : CorePlugin() {
         AsyncCatcher.enabled = false
         ItemService
         NpcService
-        SpleefPlayerService
         LobbyService
         GameService
+        ServiceManager
 
         registerListeners(
             LoaderListener, CancellerListener
@@ -66,7 +66,7 @@ class Spleef : CorePlugin() {
 
     override fun disable() {
         DatabaseConnection.disconnect()
-        Bukkit.getOnlinePlayers().forEach { SpleefPlayerService.unload(it) }
+        ServiceManager.unregisterAllServices()
     }
 
     private fun registerListeners(vararg listeners: Listener) =

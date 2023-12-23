@@ -4,7 +4,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import ru.starfarm.spleef.player.SpleefPlayerService
+import ru.starfarm.spleef.player.ISpleefPlayerService
 
 /**
  * @author nolleNNN
@@ -16,13 +16,13 @@ object LoaderListener : Listener {
     @EventHandler
     fun PlayerJoinEvent.handle() {
         joinMessage = null
-        SpleefPlayerService.load(player)
+        ISpleefPlayerService.get().load(player)
     }
 
     @EventHandler
     fun PlayerQuitEvent.handle() {
         quitMessage = null
-        SpleefPlayerService.unload(player)
+        ISpleefPlayerService.get().unload(player)
     }
 }
 

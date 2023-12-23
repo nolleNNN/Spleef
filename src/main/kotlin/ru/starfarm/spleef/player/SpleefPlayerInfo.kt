@@ -1,7 +1,9 @@
 package ru.starfarm.spleef.player
 
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import ru.starfarm.spleef.items.ItemService
+import java.util.UUID
 
 /**
  * @author nolleNNN
@@ -9,13 +11,14 @@ import ru.starfarm.spleef.items.ItemService
  * @Time 20:57
  */
 data class SpleefPlayerInfo(
-    val player: Player,
-    val items: MutableMap<Int, Boolean>,
-    var rating: Int = 0,
-    var wins: Int = 0,
-    var draw: Int = 0,
-    var lose: Int = 0,
-    var coins: Int = 0,
+        val uuid: UUID,
+        val items: MutableMap<Int, Boolean>,
+        val player: Player =  Bukkit.getPlayer(uuid),
+        var rating: Int = 0,
+        var wins: Int = 0,
+        var draw: Int = 0,
+        var lose: Int = 0,
+        var coins: Int = 0,
 ) {
     private val buyItems get() = items.filter { it.value }.keys
     val gameAmount get() = wins + lose + draw

@@ -38,7 +38,7 @@ dependencies {
     compileOnly 'org.spigotmc:spigot:1.12.2-R0.1-SNAPSHOT'
     compileOnly 'com.destroystokyo.paper:paper-api:1.12.2-R0.1-SNAPSHOT'
     implementation 'ru.starfarm:maps-service-api:1.0.5'
-    compileOnly 'ru.starfarm:core:1.3.79'
+    compileOnly 'ru.starfarm:core:1.3.96'
 
     compileOnly fileTree(dir: 'libs', includes: ['*.jar'])
 

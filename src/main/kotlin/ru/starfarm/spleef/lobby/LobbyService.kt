@@ -27,7 +27,7 @@ object LobbyService {
         Event.on<PlayerInteractFakeEntityEvent> {
             val npc = NpcService.get(1)
             if (interact == Interact.ATTACK) {
-                if (entity == npc?.fakeVillager && !clicks.contains(player)) {
+                if (entity == npc?.fakeEntity && !clicks.contains(player)) {
                     player.add(players, clicks)
                     player.sendPlayerMessage("§aВы успешно добавлены в очередь!")
                 } else {

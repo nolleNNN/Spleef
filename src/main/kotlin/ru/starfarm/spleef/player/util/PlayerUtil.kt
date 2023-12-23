@@ -4,7 +4,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import ru.starfarm.core.ApiManager
 import ru.starfarm.core.util.format.ChatUtil
-import ru.starfarm.spleef.player.SpleefPlayerService
+import ru.starfarm.spleef.player.ISpleefPlayerService
 
 /**
  * @author nolleNNN
@@ -14,7 +14,7 @@ import ru.starfarm.spleef.player.SpleefPlayerService
 const val Prefix = "§bSpleef §6> §f"
 val Player.profile get() = ApiManager.getPlayerProfile(this)
 val Player.coloredName get() = profile!!.coloredName
-val Player.spleefPlayer get() = SpleefPlayerService.getSpleefPlayer(this)
+val Player.spleefPlayer get() = ISpleefPlayerService.get().getSpleefPlayerInfo(this)
 val Material.isSpade get() = this == Material.DIAMOND_SPADE
 fun Player.sendPlayerMessage(message: String) = sendMessage("$Prefix$message")
 fun Player.sendPlayerTitle(upperMessage: String, lowerMessage: String) =
