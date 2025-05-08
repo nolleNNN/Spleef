@@ -1,48 +1,26 @@
-buildscript {
-    repositories {
-        maven { url 'https://jitpack.io' }
-        maven { url 'https://repo.starfarm.fun/releases' }
-        maven {
-            url = "https://repo.starfarm.fun/private"
-            credentials {
-                username System.getenv("SF_REPO_USER")
-                password System.getenv("SF_REPO_PASSWORD")
-            }
-        }
-    }
-}
-
-
 plugins {
-    id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.8.20'
 }
 
 repositories {
     mavenCentral()
-    maven { url 'https://repo.papermc.io/repository/maven-public/' }
-    maven { url 'https://repo.starfarm.fun/releases' }
+    mavenLocal()
     maven {
-        url = "https://repo.starfarm.fun/private"
+        url "https://repo.c7x.dev/repository/maven-public/"
         credentials {
-            username System.getenv("SF_REPO_USER")
-            password System.getenv("SF_REPO_PASSWORD")
+            username System.getenv("REPO_C7X_USERNAME")
+            password System.getenv("REPO_C7X_PASSWORD")
         }
     }
-    maven { url 'https://maven.elmakers.com/repository/' }
 }
-
-repositories.addAll(buildscript.repositories)
 
 dependencies {
-    compileOnly 'org.spigotmc:spigot:1.12.2-R0.1-SNAPSHOT'
-    compileOnly 'com.destroystokyo.paper:paper-api:1.12.2-R0.1-SNAPSHOT'
-    implementation 'ru.starfarm:maps-service-api:1.0.5'
-    compileOnly 'ru.starfarm:core:1.3.96'
-
-    compileOnly fileTree(dir: 'libs', includes: ['*.jar'])
-
+    compileOnly 'gg.cristalix:diamondpaper:1.2.20'
+    compileOnly 'ru.cristalix.core:bukkit-api:1.7.2'
 }
+
+group = 'gg.cristalix.spleef'
+version = '1.1'
 
 jar {
     from configurations.runtimeClasspath.collect(project.&zipTree)

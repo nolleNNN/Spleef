@@ -1,6 +1,6 @@
 name: Spleef
 version: '${version}'
-main: ru.starfarm.spleef.Spleef
+main: gg.cristalix.spleef.Spleef
 author: nolleNNN
 depend:
   - Core
