@@ -31,9 +31,9 @@ class GameListener(private val spleefArena: SpleefArena) : Listener {
     }
 
     @EventHandler
-    fun PlayerLeaveArenaEvent.handle() {
+    fun PlayerLeaveArenaEvent.handle() =
         spleefArena.endGame(player.uniqueId)
-    }
+
 
     @EventHandler
     fun PlayerMoveEvent.handle() {
